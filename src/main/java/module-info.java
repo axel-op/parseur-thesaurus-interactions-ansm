@@ -1,3 +1,5 @@
 module app.mesmedicaments.interactions.thesaurus_ansm {
-    requires java.logging;
+    requires org.slf4j;
+    requires pdfbox;
+    requires static lombok;
 }
