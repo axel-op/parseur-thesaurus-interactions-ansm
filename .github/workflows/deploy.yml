@@ -1,0 +1,22 @@
+name: Test and deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          server-password: MAVEN_GITHUB_TOKEN
+      - name: Build, test and deploy with Maven
+        run: mvn --batch-mode deploy
+        env:
+          MAVEN_GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}
