@@ -7,8 +7,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
+/**
+ * Une classe de substances contenue dans le thésaurus
+ */
 @EqualsAndHashCode
-public class ThesaurusClasseSubstances {
+public class ThesaurusClasse {
 
     @Getter
     @NonNull
@@ -16,7 +19,7 @@ public class ThesaurusClasseSubstances {
     @NonNull
     private final Set<ThesaurusSubstance> substances;
 
-    public ThesaurusClasseSubstances(String name, Collection<ThesaurusSubstance> substances) {
+    public ThesaurusClasse(String name, Collection<ThesaurusSubstance> substances) {
         this.name = name;
         this.substances = new HashSet<>(substances);
     }

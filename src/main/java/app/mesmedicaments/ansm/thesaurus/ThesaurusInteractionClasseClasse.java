@@ -1,10 +1,10 @@
 package app.mesmedicaments.ansm.thesaurus;
 
 public final class ThesaurusInteractionClasseClasse
-        extends ThesaurusInteraction<ThesaurusClasseSubstances, ThesaurusClasseSubstances> {
+        extends ThesaurusInteraction<ThesaurusClasse, ThesaurusClasse> {
 
-    public ThesaurusInteractionClasseClasse(ThesaurusClasseSubstances classe1,
-            ThesaurusClasseSubstances classe2, ThesaurusInteractionLevel level, String description,
+    public ThesaurusInteractionClasseClasse(ThesaurusClasse classe1,
+            ThesaurusClasse classe2, ThesaurusInteractionLevel level, String description,
             String conduiteATenir) {
         super(classe1, classe2, level, description, conduiteATenir);
     }

@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusClasseSubstances;
+import app.mesmedicaments.ansm.thesaurus.ThesaurusClasse;
 import app.mesmedicaments.ansm.thesaurus.ThesaurusInteraction;
 import app.mesmedicaments.ansm.thesaurus.ThesaurusInteractionClasseClasse;
 import app.mesmedicaments.ansm.thesaurus.ThesaurusInteractionClasseSubstance;
@@ -71,7 +71,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
 
     private Set<ThesaurusInteraction<?, ?>> makeInteractionsFromStates(List<State> states) {
         final Set<ThesaurusInteraction<?, ?>> interactions = new HashSet<>();
-        final Map<String, ThesaurusClasseSubstances> classes = extractClassesFromStates(states);
+        final Map<String, ThesaurusClasse> classes = extractClassesFromStates(states);
         final Map<String, Map<String, List<State>>> groups = groupAndNormalizeStates(states);
         for (String left : groups.keySet()) {
             for (String right : groups.get(left).keySet()) {
@@ -127,7 +127,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         return groups;
     }
 
-    private Map<String, ThesaurusClasseSubstances> extractClassesFromStates(List<State> states) {
+    private Map<String, ThesaurusClasse> extractClassesFromStates(List<State> states) {
         final Map<String, Set<String>> classes = new HashMap<>();
         for (State state : states) {
             if (!state.compoClasse.startsWith("("))
@@ -138,7 +138,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         }
         return classes.entrySet().stream()
                 .collect(Collectors.toMap(e -> e.getKey(),
-                        e -> new ThesaurusClasseSubstances(e.getKey(), e.getValue().stream()
+                        e -> new ThesaurusClasse(e.getKey(), e.getValue().stream()
                                 .map(ThesaurusSubstance::new).collect(Collectors.toSet()))));
     }
 
