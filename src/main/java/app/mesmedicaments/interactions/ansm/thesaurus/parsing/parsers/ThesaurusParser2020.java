@@ -129,10 +129,9 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                     .replaceFirst("\\)$", "").split(", ?"));
             classes.computeIfAbsent(state.left, k -> new HashSet<>()).addAll(substances);
         }
-        return classes.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey(),
-                        e -> new ThesaurusClasse(e.getKey(), e.getValue().stream()
-                                .map(ThesaurusSubstance::new).collect(Collectors.toSet()))));
+        return classes.entrySet().stream().collect(
+                Collectors.toMap(e -> e.getKey(), e -> new ThesaurusClasse(e.getKey(), e.getValue()
+                        .stream().map(ThesaurusSubstance::new).collect(Collectors.toSet()))));
     }
 
     private void parseLine(String text, List<TextPosition> textPositions) {
@@ -166,6 +165,8 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         if (sizeInPt == sizeInPtDescription) {
             if (currentState.right == null) {
                 if (textNormalized.startsWith("("))
+                    currentState.compoClasse = textNormalized;
+                else if (!currentState.compoClasse.equals(""))
                     currentState.compoClasse += textNormalized;
                 return;
             }
