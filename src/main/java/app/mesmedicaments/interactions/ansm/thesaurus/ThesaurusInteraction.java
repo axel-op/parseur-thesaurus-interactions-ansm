@@ -13,11 +13,17 @@ public abstract class ThesaurusInteraction<L, R> {
 
     @NonNull
     private final L leftElement;
+
     @NonNull
     private final R rightElement;
+    
     // TODO: rendre non-nullable
     private final ThesaurusInteractionLevel level;
+
+    @EqualsAndHashCode.Exclude
     private final String description;
+
+    @EqualsAndHashCode.Exclude
     private final String conduiteATenir;
 
 }
