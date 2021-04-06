@@ -1,4 +1,4 @@
-package app.mesmedicaments.ansm.thesaurus.parsing.parsers;
+package app.mesmedicaments.interactions.ansm.thesaurus.parsing.parsers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,15 +15,8 @@ import java.util.stream.Stream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusClasse;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusInteraction;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusInteractionClasseClasse;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusInteractionClasseSubstance;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusInteractionLevel;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusInteractionSubstanceSubstance;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusSubstance;
-import app.mesmedicaments.ansm.thesaurus.parsing.ThesaurusParseException;
-import app.mesmedicaments.ansm.thesaurus.parsing.ThesaurusParser;
+import app.mesmedicaments.interactions.ansm.thesaurus.*;
+import app.mesmedicaments.interactions.ansm.thesaurus.parsing.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 

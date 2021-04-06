@@ -1,4 +1,4 @@
-package app.mesmedicaments.ansm.thesaurus.parsing.parsers;
+package app.mesmedicaments.interactions.ansm.thesaurus.parsing.parsers;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

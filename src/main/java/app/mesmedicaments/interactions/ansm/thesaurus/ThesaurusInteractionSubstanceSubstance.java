@@ -1,4 +1,4 @@
-package app.mesmedicaments.ansm.thesaurus;
+package app.mesmedicaments.interactions.ansm.thesaurus;
 
 public final class ThesaurusInteractionSubstanceSubstance
         extends ThesaurusInteraction<ThesaurusSubstance, ThesaurusSubstance> {

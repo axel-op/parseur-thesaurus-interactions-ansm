@@ -1,4 +1,4 @@
-package app.mesmedicaments.ansm.thesaurus;
+package app.mesmedicaments.interactions.ansm.thesaurus;
 
 import java.util.Collection;
 import java.util.HashSet;

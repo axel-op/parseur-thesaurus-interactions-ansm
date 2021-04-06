@@ -1,7 +1,7 @@
-package app.mesmedicaments.ansm.thesaurus.parsing;
+package app.mesmedicaments.interactions.ansm.thesaurus.parsing;
 
 import java.util.Set;
-import app.mesmedicaments.ansm.thesaurus.ThesaurusInteraction;
+import app.mesmedicaments.interactions.ansm.thesaurus.ThesaurusInteraction;
 
 public abstract class ThesaurusParser {
 

@@ -1,4 +1,4 @@
-package app.mesmedicaments.ansm.thesaurus.parsing;
+package app.mesmedicaments.interactions.ansm.thesaurus.parsing;
 
 public class ThesaurusParseException extends Exception {
 

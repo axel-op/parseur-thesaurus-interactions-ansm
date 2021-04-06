@@ -1,9 +1,9 @@
-package app.mesmedicaments.ansm.thesaurus;
+package app.mesmedicaments.interactions.ansm.thesaurus;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.apache.pdfbox.Loader;
 import org.junit.jupiter.api.Test;
-import app.mesmedicaments.ansm.thesaurus.parsing.parsers.ThesaurusParser2020;
+import app.mesmedicaments.interactions.ansm.thesaurus.parsing.parsers.ThesaurusParser2020;
 import java.io.IOException;
 
 public class ThesaurusParserTest {
