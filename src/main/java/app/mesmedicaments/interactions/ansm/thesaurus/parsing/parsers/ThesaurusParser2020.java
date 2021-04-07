@@ -73,9 +73,11 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         final Map<String, Map<String, List<State>>> groups = groupAndNormalizeStates(states);
         for (String left : groups.keySet()) {
             for (String right : groups.get(left).keySet()) {
-                final boolean leftIsClasse = classes.keySet().contains(left);
-                final boolean rightIsClasse = classes.keySet().contains(right);
                 for (State state : groups.get(left).get(right)) {
+                    left = tryToMatchClasse(left, classes.keySet());
+                    right = tryToMatchClasse(right, classes.keySet());
+                    final boolean leftIsClasse = classes.keySet().contains(left);
+                    final boolean rightIsClasse = classes.keySet().contains(right);
                     // TODO: analyser et rectifier les cas où state.level == null
                     // assert state.level != null;
                     final var level = state.level == null ? null
@@ -104,6 +106,13 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         return interactions;
     }
 
+    private String tryToMatchClasse(String name, Set<String> classes) {
+        final String n = name.replaceFirst("(?i:AUTRES )", "");
+        if (classes.contains(n))
+            return n;
+        return name;
+    }
+
     private Map<String, Map<String, List<State>>> groupAndNormalizeStates(
             Collection<State> states) {
         final Map<String, Map<String, List<State>>> groups = new HashMap<>();
@@ -115,7 +124,9 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         }
         for (String left : groups.keySet()) {
             for (String right : groups.get(left).keySet()) {
+                // état qui ont les mêmes éléments à gauche et à droite
                 final var identical = groups.get(left).get(right);
+                // s'ils ont plusieurs descriptions, on choisit la plus longue
                 final var bestDescr = identical.stream().map(s -> s.description)
                         .max(Comparator.comparing(String::length)).get();
                 for (State state : identical) {
@@ -140,11 +151,12 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                         .stream().map(ThesaurusSubstance::new).collect(Collectors.toSet()))));
     }
 
-    private State parseLine(String text, List<TextPosition> textPositions, State currentState) {
-        final var textNormalized = normalizer.normalize(text);
+    private State parseLine(String text, List<TextPosition> textPositions, State state) {
+        text = normalizer.normalize(text);
 
-        if (patternsSkipLine.stream().anyMatch(p -> p.matcher(textNormalized).matches())) {
-            return currentState;
+        final var t = text; // très agaçant
+        if (patternsSkipLine.stream().anyMatch(p -> p.matcher(t).matches())) {
+            return state;
         }
 
         final float size = textPositions.get(0).getFontSize();
@@ -152,51 +164,61 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         final float xPos = textPositions.get(0).getX();
 
         if (size == sizeRightSubstance) {
-            final var newState = new State();
-            newState.left = currentState.left;
-            newState.compoClasse = currentState.compoClasse;
-            newState.right = textNormalized;
-            return newState;
+            if (state.right != null && state.level == null && state.description.equals("")) {
+                // il s'agit probablement du nom qui s'étend sur plusieurs lignes
+                state.right += " " + text;
+            } else {
+                final var newState = new State();
+                newState.left = state.left;
+                newState.compoClasse = state.compoClasse;
+                newState.right = text;
+                state = newState;
+            }
+            return state;
         }
 
         if (size == sizeLeftSubstance) {
-            final var newState = new State();
-            newState.left = textNormalized;
-            return newState;
+            if (state.right != null || state.left == null) {
+                state = new State();
+                state.left = text;
+            } else {
+                // sinon il s'agit probablement de la continuité du nom précédent
+                state.left += " " + text;
+            }
+            return state;
         }
 
         if (sizeInPt == sizeInPtDescription) {
-            if (currentState.right == null) {
-                if (textNormalized.startsWith("("))
-                    currentState.compoClasse = textNormalized;
-                else if (!currentState.compoClasse.equals(""))
-                    currentState.compoClasse += textNormalized;
-                return currentState;
+            if (state.right == null) {
+                if (text.startsWith("("))
+                    state.compoClasse = text;
+                else if (!state.compoClasse.equals(""))
+                    state.compoClasse += text;
+                return state;
             }
             final var optLevel = IterablesExtensions.getFirstIndexWhere(patternsNiveaux,
-                    p -> p.matcher(textNormalized).find());
+                    p -> p.matcher(t).find());
             if (optLevel.isPresent()) {
                 final int level = optLevel.get();
-                if (currentState.level != null)
+                if (state.level != null)
                     // on crée un nouvel état
-                    currentState = currentState.withLevel(level);
+                    state = state.withLevel(level);
                 else
                     // on conserve le même
-                    currentState.level = level;
-                currentState.conduite = "";
-                return currentState;
+                    state.level = level;
+                state.conduite = "";
+                return state;
             }
-            if (textNormalized.contains("association de deux anti")) {
+            if (text.contains("association de deux anti")) {
                 // TODO: corriger ce cas
             }
             if (Math.abs(xPos - 97) < Math.abs(xPos - 317))
-                currentState.description += textNormalized;
+                state.description += text;
             else
-                currentState.conduite += textNormalized;
-            return currentState;
+                state.conduite += text;
+            return state;
         }
-
-        return currentState;
+        return state;
     }
 
 }
