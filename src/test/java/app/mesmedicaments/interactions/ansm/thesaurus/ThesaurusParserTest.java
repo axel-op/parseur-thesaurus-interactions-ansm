@@ -8,12 +8,12 @@ import java.io.IOException;
 
 public class ThesaurusParserTest {
 
-
     @Test
     public void testThesaurusParser2020() throws IOException {
         final var file = getClass().getResourceAsStream("Thesaurus202010.pdf");
         assert file != null;
         final var document = Loader.loadPDF(file);
-        assertDoesNotThrow(() -> new ThesaurusParser2020(document).parse());
+        final var results = assertDoesNotThrow(() -> new ThesaurusParser2020().parseFile(document));
+        assertTrue(!results.isEmpty());
     }
 }

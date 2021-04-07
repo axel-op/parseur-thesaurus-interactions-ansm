@@ -3,12 +3,15 @@ package app.mesmedicaments.interactions.ansm.thesaurus.parsing.parsers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,31 +41,33 @@ public class ThesaurusParser2020 extends ThesaurusParser {
             Stream.of("www\\.ansm.*", "\\d+", "\\+", "\\d+/\\d+", "ANSM.*").map(Pattern::compile)
                     .collect(Collectors.toList());
 
-    private final PDDocument document;
     private final StringNormalizer normalizer = new StringNormalizer();
-    private final List<State> states = new ArrayList<>();
-    private State currentState = new State();
 
     @Override
-    public Set<ThesaurusInteraction<?, ?>> parse() throws ThesaurusParseException {
+    public Set<ThesaurusInteraction<?, ?>> parseFile(PDDocument document)
+            throws ThesaurusParseException {
+        final Deque<State> states = new LinkedBlockingDeque<>();
+        states.add(new State());
         try {
             final var stripper = new PDFTextStripper() {
                 @Override
                 protected void writeString(String text, List<TextPosition> textPositions)
                         throws IOException {
-                    parseLine(text, textPositions);
+                    final var currentState = states.getLast();
+                    final var newState = parseLine(text, textPositions, currentState);
+                    if (newState != currentState)
+                        states.add(newState);
                     super.writeString(text, textPositions);
                 };
             };
             stripper.getText(document);
-            states.add(currentState);
             return makeInteractionsFromStates(states);
         } catch (IOException e) {
             throw new ThesaurusParseException(e);
         }
     }
 
-    private Set<ThesaurusInteraction<?, ?>> makeInteractionsFromStates(List<State> states) {
+    private Set<ThesaurusInteraction<?, ?>> makeInteractionsFromStates(Collection<State> states) {
         final Set<ThesaurusInteraction<?, ?>> interactions = new HashSet<>();
         final Map<String, ThesaurusClasse> classes = extractClassesFromStates(states);
         final Map<String, Map<String, List<State>>> groups = groupAndNormalizeStates(states);
@@ -99,7 +104,8 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         return interactions;
     }
 
-    private Map<String, Map<String, List<State>>> groupAndNormalizeStates(List<State> states) {
+    private Map<String, Map<String, List<State>>> groupAndNormalizeStates(
+            Collection<State> states) {
         final Map<String, Map<String, List<State>>> groups = new HashMap<>();
         for (State state : states) {
             if (state.left == null || state.right == null)
@@ -120,7 +126,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         return groups;
     }
 
-    private Map<String, ThesaurusClasse> extractClassesFromStates(List<State> states) {
+    private Map<String, ThesaurusClasse> extractClassesFromStates(Collection<State> states) {
         final Map<String, Set<String>> classes = new HashMap<>();
         for (State state : states) {
             if (!state.compoClasse.startsWith("("))
@@ -134,11 +140,11 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                         .stream().map(ThesaurusSubstance::new).collect(Collectors.toSet()))));
     }
 
-    private void parseLine(String text, List<TextPosition> textPositions) {
+    private State parseLine(String text, List<TextPosition> textPositions, State currentState) {
         final var textNormalized = normalizer.normalize(text);
 
         if (patternsSkipLine.stream().anyMatch(p -> p.matcher(textNormalized).matches())) {
-            return;
+            return currentState;
         }
 
         final float size = textPositions.get(0).getFontSize();
@@ -146,20 +152,17 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         final float xPos = textPositions.get(0).getX();
 
         if (size == sizeRightSubstance) {
-            states.add(currentState);
             final var newState = new State();
             newState.left = currentState.left;
             newState.compoClasse = currentState.compoClasse;
-            currentState = newState;
-            currentState.right = textNormalized;
-            return;
+            newState.right = textNormalized;
+            return newState;
         }
 
         if (size == sizeLeftSubstance) {
-            states.add(currentState);
-            currentState = new State();
-            currentState.left = textNormalized;
-            return;
+            final var newState = new State();
+            newState.left = textNormalized;
+            return newState;
         }
 
         if (sizeInPt == sizeInPtDescription) {
@@ -168,17 +171,20 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                     currentState.compoClasse = textNormalized;
                 else if (!currentState.compoClasse.equals(""))
                     currentState.compoClasse += textNormalized;
-                return;
+                return currentState;
             }
-            final var optNiveau = IterablesExtensions.getFirstIndexWhere(patternsNiveaux,
+            final var optLevel = IterablesExtensions.getFirstIndexWhere(patternsNiveaux,
                     p -> p.matcher(textNormalized).find());
-            if (optNiveau.isPresent()) {
-                final int level = optNiveau.get();
+            if (optLevel.isPresent()) {
+                final int level = optLevel.get();
                 if (currentState.level != null)
-                    states.add(currentState);
-                currentState = currentState.withLevel(level);
+                    // on crée un nouvel état
+                    currentState = currentState.withLevel(level);
+                else
+                    // on conserve le même
+                    currentState.level = level;
                 currentState.conduite = "";
-                return;
+                return currentState;
             }
             if (textNormalized.contains("association de deux anti")) {
                 // TODO: corriger ce cas
@@ -187,10 +193,10 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                 currentState.description += textNormalized;
             else
                 currentState.conduite += textNormalized;
-            return;
+            return currentState;
         }
 
-        assert states.isEmpty();
+        return currentState;
     }
 
 }
