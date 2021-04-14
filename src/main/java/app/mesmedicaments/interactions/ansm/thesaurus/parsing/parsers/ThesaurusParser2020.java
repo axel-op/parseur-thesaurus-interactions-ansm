@@ -46,7 +46,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
     @Override
     public Set<ThesaurusInteraction<?, ?>> parseFile(PDDocument document)
             throws ThesaurusParseException {
-        final Deque<State> states = new LinkedBlockingDeque<>();
+        final Deque<State> states = new LinkedBlockingDeque<>(4000);
         states.add(new State());
         try {
             final var stripper = new PDFTextStripper() {
@@ -68,7 +68,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
     }
 
     private Set<ThesaurusInteraction<?, ?>> makeInteractionsFromStates(Collection<State> states) {
-        final Set<ThesaurusInteraction<?, ?>> interactions = new HashSet<>();
+        final Set<ThesaurusInteraction<?, ?>> interactions = new HashSet<>(2000);
         final Map<String, ThesaurusClasse> classes = extractClassesFromStates(states);
         final Map<String, Map<String, List<State>>> groups = groupAndNormalizeStates(states);
         for (String left : groups.keySet()) {
@@ -115,7 +115,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
 
     private Map<String, Map<String, List<State>>> groupAndNormalizeStates(
             Collection<State> states) {
-        final Map<String, Map<String, List<State>>> groups = new HashMap<>();
+        final Map<String, Map<String, List<State>>> groups = new HashMap<>(700);
         for (State state : states) {
             if (state.left == null || state.right == null)
                 continue;
@@ -138,7 +138,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
     }
 
     private Map<String, ThesaurusClasse> extractClassesFromStates(Collection<State> states) {
-        final Map<String, Set<String>> classes = new HashMap<>();
+        final Map<String, Set<String>> classes = new HashMap<>(200);
         for (State state : states) {
             if (!state.compoClasse.startsWith("("))
                 continue;
