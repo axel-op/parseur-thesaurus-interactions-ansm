@@ -192,7 +192,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
             if (state.right == null) {
                 if (text.startsWith("("))
                     state.compoClasse = text;
-                else if (!state.compoClasse.equals(""))
+                else if (state.compoClasse.length() > 0)
                     state.compoClasse += text;
                 return state;
             }
@@ -212,9 +212,12 @@ public class ThesaurusParser2020 extends ThesaurusParser {
             if (text.contains("association de deux anti")) {
                 // TODO: corriger ce cas
             }
-            if (Math.abs(xPos - 97) < Math.abs(xPos - 317))
-                state.description += text;
-            else
+            if (Math.abs(xPos - 97) < Math.abs(xPos - 317)) {
+                if (state.description.length() > 0)
+                    state.description += " " + text;
+                else
+                    state.description += text;
+            } else
                 state.conduite += text;
             return state;
         }

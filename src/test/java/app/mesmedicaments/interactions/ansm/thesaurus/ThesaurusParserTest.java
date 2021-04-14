@@ -21,6 +21,14 @@ public class ThesaurusParserTest {
         assertTrue(!results.isEmpty());
     }
 
+    @Test
+    public void testRetoursALaLigne() throws IOException {
+        final var document = getFile2020();
+        final var results = assertDoesNotThrow(() -> new ThesaurusParser2020().parseFile(document));
+        assertTrue(
+                results.stream().noneMatch(i -> i.getDescription().contains("effetsindésirables")));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"substances à absorption",
     // TODO
