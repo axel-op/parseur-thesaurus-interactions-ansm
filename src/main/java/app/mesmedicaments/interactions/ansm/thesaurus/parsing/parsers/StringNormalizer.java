@@ -1,7 +1,7 @@
 package app.mesmedicaments.interactions.ansm.thesaurus.parsing.parsers;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
+// import java.util.Arrays;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +16,7 @@ class StringNormalizer {
         byte[] normalized = new byte[original.length];
         for (int i = 0; i < original.length; i++) {
             switch (Integer.valueOf(original[i])) {
+                /*
                 // a
                 case -32:
                 case -30:
@@ -48,6 +49,7 @@ class StringNormalizer {
                     normalized[i + 1] = 101;
                     i++;
                     break;
+                */
                 // apostrophe
                 case -110:
                     normalized[i] = 39;
