@@ -1,15 +1,9 @@
-name: Test and deploy
+name: Test
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "src/main/**"
-      - "pom.xml"
+on: [push, pull_request]
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +13,7 @@ jobs:
         with:
           java-version: 11
           server-password: MAVEN_GITHUB_TOKEN
-      - name: Build, test and deploy with Maven
-        run: mvn --batch-mode deploy
+      - name: Build and test with Maven
+        run: mvn --batch-mode test
         env:
           MAVEN_GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}
