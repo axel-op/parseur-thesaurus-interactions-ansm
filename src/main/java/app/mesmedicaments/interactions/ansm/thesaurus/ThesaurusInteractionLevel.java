@@ -16,5 +16,15 @@ public enum ThesaurusInteractionLevel {
     /**
      * Contre-indication
      */
-    CI
+    CI;
+
+    public int intValue() {
+        final var values = ThesaurusInteractionLevel.values();
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == this)
+                return i;
+        }
+        throw new IllegalArgumentException(
+                "This should never happen. Cannot find int value for " + this.toString());
+    }
 }
