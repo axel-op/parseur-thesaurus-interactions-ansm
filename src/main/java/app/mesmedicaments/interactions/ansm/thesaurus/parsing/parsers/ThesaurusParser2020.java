@@ -57,7 +57,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                     final var newState = parseLine(text, textPositions, currentState);
                     if (newState != currentState)
                         states.add(newState);
-                    super.writeString(text, textPositions);
+                    // super.writeString(text, textPositions);
                 };
             };
             stripper.getText(document);
