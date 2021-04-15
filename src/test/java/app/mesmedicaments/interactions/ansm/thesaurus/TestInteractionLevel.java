@@ -10,9 +10,9 @@ public class TestInteractionLevel {
     public void testIntValue() {
         int i = 0;
         for (var v : ThesaurusInteractionLevel.values()) {
-            final int intValue = assertDoesNotThrow(() -> v.intValue());
-            assertEquals(i, intValue);
             i += 1;
+            final int intValue = assertDoesNotThrow(() -> v.getValeurSeverite());
+            assertEquals(i, intValue);
         }
     }
     

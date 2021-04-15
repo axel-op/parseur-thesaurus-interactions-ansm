@@ -1,30 +1,28 @@
 package app.mesmedicaments.interactions.ansm.thesaurus;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum ThesaurusInteractionLevel {
     /**
      * A prendre en compte
      */
-    APEC,
+    APEC(1),
     /**
      * Précaution d'emploi
      */
-    PE,
+    PE(2),
     /**
      * Association déconseillée
      */
-    AD,
+    AD(3),
     /**
      * Contre-indication
      */
-    CI;
+    CI(4);
 
-    public int intValue() {
-        final var values = ThesaurusInteractionLevel.values();
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] == this)
-                return i;
-        }
-        throw new IllegalArgumentException(
-                "This should never happen. Cannot find int value for " + this.toString());
-    }
+    @Getter
+    private final int valeurSeverite;
+
 }
