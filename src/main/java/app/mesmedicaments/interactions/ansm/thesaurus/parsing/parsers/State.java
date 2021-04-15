@@ -17,8 +17,8 @@ class State {
     String left = null;
     String right = null;
     Integer level = null;
-    String description = "";
-    String conduite = "";
-    String compoClasse = "";
-    
+    StringBuilder description = new StringBuilder();
+    StringBuilder conduite = new StringBuilder();
+    StringBuilder compoClasse = new StringBuilder();
+
 }

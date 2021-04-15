@@ -82,8 +82,8 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                     // assert state.level != null;
                     final var level = state.level == null ? null
                             : ThesaurusInteractionLevel.values()[state.level];
-                    final var description = state.description;
-                    final var conduiteATenir = state.conduite;
+                    final var description = state.description.toString();
+                    final var conduiteATenir = state.conduite.toString();
                     ThesaurusInteraction<?, ?> interaction;
                     if (leftIsClasse && rightIsClasse) {
                         interaction = new ThesaurusInteractionClasseClasse(classes.get(left),
@@ -128,7 +128,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                 final var identical = groups.get(left).get(right);
                 // s'ils ont plusieurs descriptions, on choisit la plus longue
                 final var bestDescr = identical.stream().map(s -> s.description)
-                        .max(Comparator.comparing(String::length)).get();
+                        .max(Comparator.comparing(StringBuilder::length)).get();
                 for (State state : identical) {
                     state.description = bestDescr;
                 }
@@ -140,10 +140,11 @@ public class ThesaurusParser2020 extends ThesaurusParser {
     private Map<String, ThesaurusClasse> extractClassesFromStates(Collection<State> states) {
         final Map<String, Set<String>> classes = new HashMap<>(200);
         for (State state : states) {
-            if (!state.compoClasse.startsWith("("))
+            final var compoClasse = state.compoClasse.toString();
+            if (!compoClasse.startsWith("("))
                 continue;
-            final var substances = Arrays.asList(state.compoClasse.replaceFirst("^\\(", "")
-                    .replaceFirst("\\)$", "").split(", ?"));
+            final var substances = Arrays.asList(
+                    compoClasse.replaceFirst("^\\(", "").replaceFirst("\\)$", "").split(", ?"));
             classes.computeIfAbsent(state.left, k -> new HashSet<>()).addAll(substances);
         }
         return classes.entrySet().stream().collect(
@@ -164,7 +165,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         final float xPos = textPositions.get(0).getX();
 
         if (size == sizeRightSubstance) {
-            if (state.right != null && state.level == null && state.description.equals("")) {
+            if (state.right != null && state.level == null && state.description.length() == 0) {
                 // il s'agit probablement du nom qui s'étend sur plusieurs lignes
                 state.right += " " + text;
             } else {
@@ -191,9 +192,9 @@ public class ThesaurusParser2020 extends ThesaurusParser {
         if (sizeInPt == sizeInPtDescription) {
             if (state.right == null) {
                 if (text.startsWith("("))
-                    state.compoClasse = text;
+                    state.compoClasse = new StringBuilder(text);
                 else if (state.compoClasse.length() > 0)
-                    state.compoClasse += text;
+                    state.compoClasse.append(text);
                 return state;
             }
             final var optLevel = IterablesExtensions.getFirstIndexWhere(patternsNiveaux,
@@ -206,7 +207,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
                 else
                     // on conserve le même
                     state.level = level;
-                state.conduite = "";
+                state.conduite = new StringBuilder();
                 return state;
             }
             if (text.contains("association de deux anti")) {
@@ -214,11 +215,10 @@ public class ThesaurusParser2020 extends ThesaurusParser {
             }
             if (Math.abs(xPos - 97) < Math.abs(xPos - 317)) {
                 if (state.description.length() > 0)
-                    state.description += " " + text;
-                else
-                    state.description += text;
+                    state.description.append(" ");
+                state.description.append(text);
             } else
-                state.conduite += text;
+                state.conduite.append(text);
             return state;
         }
         return state;
