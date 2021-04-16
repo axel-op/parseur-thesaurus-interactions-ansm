@@ -44,7 +44,7 @@ public class ThesaurusParser2020 extends ThesaurusParser {
     private final StringNormalizer normalizer = new StringNormalizer();
 
     @Override
-    public Set<ThesaurusInteraction<?, ?>> parseFile(PDDocument document)
+    protected Set<ThesaurusInteraction<?, ?>> parseFile(PDDocument document)
             throws ThesaurusParseException {
         final Deque<State> states = new LinkedBlockingDeque<>(4000);
         states.add(new State());
